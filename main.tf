@@ -1,18 +1,49 @@
 resource "google_service_account" "default" {
-  account_id   = "service_account_id"
+    depends_on = [
+      google_project_service.project, google_project_service.cloudmanager
+    ]
+    
+  account_id   = "test-vm-sa"
   display_name = "Service Account"
+}
+#api enable
+resource "google_project_service" "project" {
+    depends_on = [
+      google_project_service.cloudmanager
+    ]
+  project = "metal-node-383004"
+  service = "iam.googleapis.com"
+
+#   timeouts {
+#     create = "30m"
+#     update = "40m"
+#   }
+
+  #disable_dependent_services = true
+}
+
+resource "google_project_service" "cloudmanager" {
+  project = "metal-node-383004"
+  service = "cloudresourcemanager.googleapis.com"
+
+#   timeouts {
+#     create = "30m"
+#     update = "40m"
+#   }
+
+  #disable_dependent_services = true
 }
 
 resource "google_compute_instance" "default" {
-  name         = "test"
+  name         = "test-vm"
   machine_type = "e2-medium"
-  zone         = "europe-east1-b"
+  zone         = "europe-west1-b"
 
   tags = ["foo", "bar"]
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 
